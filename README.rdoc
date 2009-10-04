@@ -1,3 +1,15 @@
+# Mult: utility functions for playing with Ruby Objects
+
+Includes:
+* actual_class
+* actual_class=
+* actual_super
+* actual_super=
+* is_singleton?
+* attached
+* attached=
+
+
 TO USE:
 
 gem install mult
