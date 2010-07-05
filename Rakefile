@@ -1,9 +1,9 @@
 require 'rake/clean'
-require 'rake/extensiontask'
+#require 'rake/extensiontask'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 
-MULT_VERSION = "0.1.0"
+MULT_VERSION = "0.1.2"
 
 dlext = Config::CONFIG['DLEXT']
 
@@ -19,11 +19,11 @@ spec = Gem::Specification.new do |s|
     s.email = 'jrmair@gmail.com'
     s.date = Time.now.strftime '%Y-%m-%d'
     s.require_path = 'lib'
-    s.homepage = "banisterfiend.wordpress.com"
-    s.platform = Gem::Platform::RUBY
-    s.extensions = FileList["ext/**/extconf.rb"]
+    s.homepage = "http://banisterfiend.wordpress.com"
+    s.platform = 'i386-mingw32'
+#    s.extensions = FileList["ext/**/extconf.rb"]
     s.has_rdoc = true
-    s.files = ["Rakefile", "README.rdoc", "LICENSE", "lib/mult.rb"] +
+  s.files = ["Rakefile", "README.rdoc", "LICENSE", "lib/mult.rb", "lib/1.8/mult.#{dlext}", "lib/1.9/mult.#{dlext}"] +
         FileList["ext/**/extconf.rb", "ext/**/*.h", "ext/**/*.c"].to_a
 end
 
@@ -32,11 +32,11 @@ Rake::GemPackageTask.new(spec) do |pkg|
     pkg.need_tar = false
 end
 
-Rake::ExtensionTask.new('mult', spec)  do |ext|
-    ext.config_script = 'extconf.rb' 
-    ext.cross_compile = true                
-    ext.cross_platform = 'i386-mswin32'
-end
+# Rake::ExtensionTask.new('mult', spec)  do |ext|
+#     ext.config_script = 'extconf.rb' 
+#     ext.cross_compile = true                
+#     ext.cross_platform = 'i386-mswin32'
+# end
 
 Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"

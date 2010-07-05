@@ -1,20 +1,16 @@
 #include <ruby.h>
 #include "compat.h"
 
-
 /* return the actual class of an object */
 static VALUE
 get_class(VALUE self) {    
-    
     return CLASS_OF(self);
 }
 
 /* set the class of an object */
 static VALUE
 set_class(VALUE self, VALUE klass) {
-
     KLASS_OF(self) = klass;
-    
     return klass;
 }
 
@@ -29,16 +25,13 @@ get_super(VALUE self)
 /* set the super class of an object */
 static VALUE
 set_super(VALUE self, VALUE klass) {    
-    
     RCLASS_SUPER(self) = klass;
-
     return klass;
 }
 
 /* is the object a singleton class ? */
 static VALUE
 is_singleton(VALUE self, VALUE klass) {    
-    
     return FL_TEST(self, FL_SINGLETON) ? Qtrue : Qfalse;
 }
 
