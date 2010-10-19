@@ -1,4 +1,7 @@
-require 'rbconfig'
+direc = File.dirname(__FILE__)
+
+require "rbconfig"
+require "#{direc}/mult/version"
 
 direc = File.dirname(__FILE__)
 dlext = Config::CONFIG['DLEXT']

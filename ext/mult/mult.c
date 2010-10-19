@@ -62,8 +62,8 @@ Init_mult() {
     rb_define_method(rb_cObject, "actual_class", get_class, 0);
     rb_define_method(rb_cObject, "actual_class=", set_class, 1);
 
-    rb_define_method(rb_cClass, "actual_super", get_super, 0);
-    rb_define_method(rb_cClass, "actual_super=", set_super, 1);
+    rb_define_method(rb_cModule, "actual_super", get_super, 0);
+    rb_define_method(rb_cModule, "actual_super=", set_super, 1);
 
     rb_define_method(rb_cClass, "is_singleton?", is_singleton, 0);
     
