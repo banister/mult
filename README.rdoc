@@ -8,7 +8,10 @@ Includes:
 * is_singleton?
 * attached
 * attached=
-
+* ivar_set
+* ivar_get
+* m_tbl
+* m_tbl=
 
 TO USE:
 
