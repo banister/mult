@@ -1,6 +1,9 @@
-# Mult: utility functions for playing with Ruby Objects
+Mult: utility functions for playing with Ruby Objects
+======================================================
 
-Includes:
+Methods:
+---------
+
 * actual_class
 * actual_class=
 * actual_super
@@ -12,7 +15,24 @@ Includes:
 * ivar_get
 * m_tbl
 * m_tbl=
+* iv_tbl
+* iv_tbl=
+* has_flag?
+* flags
+* flags=
+
+Constants:
+----------
+
+* T_CLASS
+* T_MODULE
+* T_OBJECT
+* T_ICLASS
+* T_DATA
+* FL_SINGLETON
+* FL_FREEZE
 
 TO USE:
+--------
 
-gem install mult
+`gem install mult`

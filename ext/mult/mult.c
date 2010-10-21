@@ -20,7 +20,6 @@ set_class(VALUE self, VALUE klass) {
   return klass;
 }
 
-
 /* get the actual super class of an object */
 static VALUE
 get_super(VALUE self)
@@ -76,33 +75,57 @@ set_attached(VALUE self, VALUE klass) {
     return Qnil;
 }
 
+/* generate table get methods */
+#define CREATE_GET_TBL_FUNC(func_name, table_type) \
+  static VALUE func_name(VALUE self) {             \
+    RubyTable * tbl_struct = ALLOC(RubyTable);    \
+    if (!table_type(self))              \
+      table_type(self) = st_init_numtable();      \
+    tbl_struct->table = table_type(self);            \
+    return Data_Wrap_Struct(cRubyTable, 0, free, tbl_struct);   \
+  }                                                                     
+
+/* generate table set methods */
+#define CREATE_SET_TBL_FUNC(func_name, table_type) \
+  static VALUE                                     \
+  func_name(VALUE self, VALUE rb_tbl) { \
+    Check_Type(rb_tbl, T_DATA); \
+    RubyTable * tbl_struct; \
+    Data_Get_Struct(rb_tbl, RubyTable, tbl_struct); \
+    table_type(self) = tbl_struct->table; \
+    rb_clear_cache(); \
+    return self; \
+  }
+  
 /* get the method table */
+CREATE_GET_TBL_FUNC(get_m_tbl, RCLASS_M_TBL)
+/* set the method table */
+CREATE_SET_TBL_FUNC(set_m_tbl, RCLASS_M_TBL)
+
+/* get the iv table */
+CREATE_GET_TBL_FUNC(get_iv_tbl, RCLASS_IV_TBL)
+/* set the iv table */
+CREATE_SET_TBL_FUNC(set_iv_tbl, RCLASS_IV_TBL)
+
 static VALUE
-get_m_tbl(VALUE self) {
-  RubyTable * m_tbl_struct = ALLOC(RubyTable);
-
-  if (!RCLASS_M_TBL(self))
-    RCLASS_M_TBL(self) = st_init_numtable();
-
-  m_tbl_struct->table = RCLASS_M_TBL(self);
-  VALUE ret = Data_Wrap_Struct(cRubyTable, 0, free, m_tbl_struct);
-
-  return ret;
+set_flags(VALUE self, VALUE flag)
+{
+  Check_Type(flag, T_FIXNUM);
+  FL_SET(self, FIX2INT(flag));
+  return self;
 }
 
-/* set the method table */
 static VALUE
-set_m_tbl(VALUE self, VALUE rb_m) {
-  Check_Type(rb_m, T_DATA);
-  
-  RubyTable * m_tbl_struct;
-  Data_Get_Struct(rb_m, RubyTable, m_tbl_struct);
-  
-  RCLASS_M_TBL(self) = m_tbl_struct->table;
+get_flags(VALUE self)
+{
+  return INT2FIX(RBASIC(self)->flags);
+}
 
-  rb_clear_cache();
-  
-  return self;
+static VALUE
+has_flag_p(VALUE self, VALUE flag)
+{
+  Check_Type(flag, T_FIXNUM);
+  return FL_TEST(self, FIX2INT(flag)) ? Qtrue : Qfalse;
 }
 
 void 
@@ -118,6 +141,8 @@ Init_mult() {
 
   rb_define_method(rb_cModule, "m_tbl", get_m_tbl, 0);
   rb_define_method(rb_cModule, "m_tbl=", set_m_tbl, 1);
+  rb_define_method(rb_cModule, "iv_tbl", get_iv_tbl, 0);
+  rb_define_method(rb_cModule, "iv_tbl=", set_iv_tbl, 1);
 
   rb_define_method(rb_cModule, "actual_super", get_super, 0);
   rb_define_method(rb_cModule, "actual_super=", set_super, 1);
@@ -126,4 +151,17 @@ Init_mult() {
     
   rb_define_method(rb_cClass, "attached", get_attached, 0);
   rb_define_method(rb_cClass, "attached=", set_attached, 1);
+
+  rb_define_method(rb_cObject, "has_flag?", has_flag_p, 1);
+  rb_define_method(rb_cObject, "flags=", set_flags, 1);
+  rb_define_method(rb_cObject, "flags", get_flags, 0);
+
+  // constants
+  rb_define_const(rb_cObject, "T_CLASS", INT2FIX(T_CLASS));
+  rb_define_const(rb_cObject, "T_MODULE", INT2FIX(T_MODULE));
+  rb_define_const(rb_cObject, "T_OBJECT", INT2FIX(T_OBJECT));
+  rb_define_const(rb_cObject, "T_DATA", INT2FIX(T_DATA));
+  rb_define_const(rb_cObject, "T_ICLASS", INT2FIX(T_ICLASS));
+  rb_define_const(rb_cObject, "FL_FREEZE", INT2FIX(FL_FREEZE));
+  rb_define_const(rb_cObject, "FL_SINGLETON", INT2FIX(FL_SINGLETON));
 }
