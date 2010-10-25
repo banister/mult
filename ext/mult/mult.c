@@ -1,3 +1,4 @@
+
 #include <ruby.h>
 #include "compat.h"
 
@@ -8,6 +9,17 @@ typedef struct {
 } RubyTable;
 
 /* return the actual class of an object */
+static VALUE
+global_get_class(VALUE self, VALUE klass) {    
+  return CLASS_OF(klass);
+}
+
+static VALUE
+global_set_class(VALUE self, VALUE klass, VALUE new_klass) {    
+  KLASS_OF(klass) = new_klass;
+  return klass;
+}
+
 static VALUE
 get_class(VALUE self) {    
   return CLASS_OF(self);
@@ -21,6 +33,18 @@ set_class(VALUE self, VALUE klass) {
 }
 
 /* get the actual super class of an object */
+static VALUE
+global_get_super(VALUE self, VALUE klass)
+{
+  return RCLASS_SUPER(klass);
+}
+
+static VALUE
+global_set_super(VALUE self, VALUE klass, VALUE sup)
+{
+  return RCLASS_SUPER(klass) = sup;
+}
+
 static VALUE
 get_super(VALUE self)
 {
@@ -42,6 +66,12 @@ is_singleton(VALUE self, VALUE klass) {
 
 /* get a raw instance var */
 static VALUE
+global_get_ivar(VALUE self, VALUE klass, VALUE sym)
+{
+  return rb_ivar_get(klass, rb_to_id(sym));
+}
+
+static VALUE
 get_ivar(VALUE self, VALUE sym)
 {
   return rb_ivar_get(self, rb_to_id(sym));
@@ -52,6 +82,12 @@ static VALUE
 set_ivar(VALUE self, VALUE sym, VALUE val)
 {
   return rb_ivar_set(self, rb_to_id(sym), val);
+}
+
+static VALUE
+global_set_ivar(VALUE self, VALUE klass, VALUE sym, VALUE val)
+{
+  return rb_ivar_set(klass, rb_to_id(sym), val);
 }
 
 /* get the attached class if receiver is a singleton class */
@@ -133,8 +169,15 @@ Init_mult() {
 
   cRubyTable = rb_define_class("RubyTable", rb_cObject);
   
+
+  rb_define_method(rb_cObject, "RCLASS_GET", global_get_class, 1);
+  rb_define_method(rb_cObject, "RCLASS_SET", global_set_class, 2);
+    
   rb_define_method(rb_cObject, "actual_class", get_class, 0);
   rb_define_method(rb_cObject, "actual_class=", set_class, 1);
+
+  rb_define_method(rb_cObject, "IVAR_GET", global_get_ivar, 2);
+  rb_define_method(rb_cObject, "IVAR_SET", global_set_ivar, 3);
 
   rb_define_method(rb_cObject, "ivar_get", get_ivar, 1);
   rb_define_method(rb_cObject, "ivar_set", set_ivar, 2);
@@ -143,6 +186,10 @@ Init_mult() {
   rb_define_method(rb_cModule, "m_tbl=", set_m_tbl, 1);
   rb_define_method(rb_cModule, "iv_tbl", get_iv_tbl, 0);
   rb_define_method(rb_cModule, "iv_tbl=", set_iv_tbl, 1);
+
+
+  rb_define_method(rb_cObject, "RCLASS_SUPER_GET", global_get_super, 1);
+  rb_define_method(rb_cObject, "RCLASS_SUPER_SET", get_super, 1);
 
   rb_define_method(rb_cModule, "actual_super", get_super, 0);
   rb_define_method(rb_cModule, "actual_super=", set_super, 1);

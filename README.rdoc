@@ -20,6 +20,15 @@ Methods:
 * has_flag?
 * flags
 * flags=
+* RCLASS_GET^
+* RCLASS_SET^
+* RCLASS_SUPER_GET^
+* RCLASS_SUPER_SET^
+* IVAR_SET^
+* IVAR_GET^
+
+(^ indicates global function, e.g: RCLASS_SUPER_GET(klass) #=> superclass_of_klass)
+
 
 Constants:
 ----------
